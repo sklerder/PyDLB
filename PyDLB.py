@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: iso8859-15 -*-
+# -*- coding: iso8859-9 -*-
 
 # Portage par JoeKer pour FONO sur la base de :
 # - rene-d/sysbus (https://github.com/rene-d/sysbus)
@@ -9,11 +9,11 @@
 import urllib.request, urllib.parse, urllib.error
 import json
 import requests
-# import requests.utils
 import time
-
+import ctypes
 import sys
 import getpass
+import re
 
 
 
@@ -78,7 +78,7 @@ class Livebox:
 		req.add_header('X-Requested-With', 'XMLHttpRequest')
 	
 		response = urllib.request.urlopen(req)
-		the_page = response.readall().decode('utf-8')
+		the_page = response.read().decode('utf-8')
 		resp = json.loads(the_page)
 		return resp
 
@@ -92,7 +92,7 @@ class Livebox:
 		req.add_header('X-Requested-With', 'XMLHttpRequest')
 
 		response = urllib.request.urlopen(req)
-		the_page = response.readall().decode('utf-8')
+		the_page = response.read().decode('utf-8')
 		resp = str(json.loads(the_page))
 		return resp
 
@@ -176,20 +176,22 @@ if __name__ == '__main__':
 	secondes = str(int(uptime % 86400 % 3600 % 60))
 	Start = jours + " j. " + heures + " h. " + minutes + " mn. " + secondes + " s." 
 
+	print("[quote]\n")
+	print("\nRésultats extraits le " + time.strftime("%d/%m/%Y à %H:%M:%S", time.localtime()) + "\n\n")
 	# # Début de DeviceInfo
 	DeviceInfo =  " Device Info" + "\n"
 	DeviceInfo += "    Manufacturer          : " + DevInfo['Manufacturer'] + "\n"
 	DeviceInfo += "    ManufacturerOUI       : " + DevInfo['ManufacturerOUI'] + "\n"
 	DeviceInfo += "    ModelName             : " + DevInfo['ModelName'] + "\n"
 	DeviceInfo += "    ProductClass          : " + DevInfo['ProductClass'] + "\n"
-	DeviceInfo += "    SerialNumber          : " + DevInfo['SerialNumber'] + "\n"
+	DeviceInfo += "    SerialNumber          : " + re.sub('[0-9]{8}$','XXXXXXXX',DevInfo['SerialNumber'],0,0) + "\n"
 	DeviceInfo += "    HardwareVersion       : " + DevInfo['HardwareVersion'] + "\n"
 	DeviceInfo += "    SoftwareVersion       : " + DevInfo['SoftwareVersion'] + "\n"
 	DeviceInfo += "    HardwareVersion 2     : " + DevInfo['AdditionalHardwareVersion'] + "\n"
 	DeviceInfo += "    SoftwareVersion 2     : " + DevInfo['AdditionalSoftwareVersion'] + "\n"
 	DeviceInfo += "    EnabledOptions        : " + DevInfo['EnabledOptions'] + "\n"
 	DeviceInfo += "    SpecVersion           : " + DevInfo['SpecVersion'] + "\n"
-	DeviceInfo += "    ProvisioningCode      : " + DevInfo['ProvisioningCode'] + "\n"
+	DeviceInfo += "    ProvisioningCode      : " + re.sub('[0-9]{4}','XXXX',DevInfo['ProvisioningCode'],0,0) + "\n"
 	DeviceInfo += "    UpTime                : " + str(DevInfo['UpTime']) + "\n"
 	DeviceInfo += "      Démarrée depuis le  : " + Date_Demarrage + "\n"
 	DeviceInfo += "      Démarrée depuis     : " + Start + "\n"
@@ -198,6 +200,7 @@ if __name__ == '__main__':
 	print(DeviceInfo)
 	# # Fin de DeviceInfo
 	
+	print("[---]\n")
 	# # Début de WanStatus
 	mtu = str(lb.mtu())
 	vlanid = str(lb.vlan_id())
@@ -209,12 +212,12 @@ if __name__ == '__main__':
 	WanStatus  = " WAN Status" + "\n"
 	WanStatus += "    LinkType            : " + wanstatus['LinkType'] + "\n"
 	WanStatus += "    LinkState           : " + wanstatus['LinkState'] + "\n"
-	WanStatus += "    MACAddress          : " + wanstatus['MACAddress'] + "\n"
+	WanStatus += "    MACAddress          : " + re.sub('[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$','XX:XX:XX:XX',wanstatus['MACAddress'],0,0) + "\n"
 	WanStatus += "    Protocol            : " + wanstatus['Protocol'] + "\n"
 	WanStatus += "    ConnectionState     : " + wanstatus['ConnectionState'] + "\n"
 	WanStatus += "    LastConnectionError : " + wanstatus['LastConnectionError'] + "\n"
-	WanStatus += "    IPAddress           : " + wanstatus['IPAddress'] + "\n"
-	WanStatus += "    RemoteGateway       : " + wanstatus['RemoteGateway'] + "\n"
+	WanStatus += "    IPAddress           : " + re.sub('\.[0-9]{1,3}\.[0-9]{1,3}$','.XX.XX',wanstatus['IPAddress'],0,0) + "\n"
+	WanStatus += "    RemoteGateway       : " + re.sub('\.[0-9]{1,3}\.[0-9]{1,3}$','.XX.XX',wanstatus['RemoteGateway'],0,0) + "\n"
 	WanStatus += "    DNSServers          : " + wanstatus['DNSServers'] + "\n"
 	WanStatus += "    IPv6Address         : " + wanstatus['IPv6Address'] + "\n"
 	WanStatus += "    Vlan ID             : " + vlanid + "\n"
@@ -223,7 +226,7 @@ if __name__ == '__main__':
 	# # Fin de WanStatus
 	
 	# # Début de VoipConfig
-	
+	print("[---]\n")
 	voip_config = lb.voip_config()
 	
 	trunks_list = lb.list_trunks()
@@ -241,7 +244,7 @@ if __name__ == '__main__':
 	VOIPConfig += "    PhysInterface            : " + voip_config[0]['PhysInterface'] + "\n"
 	VOIPConfig += "    Etat SIP                 : " + str(trunks_result[0]['trunk_lines'][0]['status']) + "\n"
 	VOIPConfig += "    Activation SIP           : " + str(trunks_result[0]['trunk_lines'][0]['enable']) + "\n"
-	VOIPConfig += "    Numéro d'annuaire SIP    : " + str(trunks_result[0]['trunk_lines'][0]['directoryNumber']) + "\n"
+	VOIPConfig += "    Numéro d'annuaire SIP    : " + re.sub('[0-9]{8}$','XXXXXXXX',str(trunks_result[0]['trunk_lines'][0]['directoryNumber']),0,0) + "\n"
 	VOIPConfig += "\n"
 	VOIPConfig += "  Name                   : " + voip_config[1]['Name'] + "\n"
 	VOIPConfig += "    Enable                   : " + voip_config[1]['Enable'] + "\n"
@@ -252,23 +255,24 @@ if __name__ == '__main__':
 	VOIPConfig += "    PhysInterface            : " + voip_config[1]['PhysInterface'] + "\n"
 	VOIPConfig += "    Etat H323                : " + str(trunks_result[1]['trunk_lines'][0]['status']) + "\n"
 	VOIPConfig += "    Activation H323          : " + str(trunks_result[1]['trunk_lines'][0]['enable']) + "\n"
-	VOIPConfig += "    Numéro d'annuaire H323   : " + str(trunks_result[1]['trunk_lines'][0]['directoryNumber']) + "\n"
+	VOIPConfig += "    Numéro d'annuaire H323   : " + re.sub('[0-9]{8}$','XXXXXXXX',str(trunks_result[1]['trunk_lines'][0]['directoryNumber']),0,0) + "\n"
 	print(VOIPConfig)
 	# # Fin de VoipConfig
 	
 	# # Début de Wi-Fi
+	print("[---]\n")
 	WifiData = lb.wifi_mibs()
 	WifiConf  = " Etat Wi-Fi" + "\n"
 	WifiConf += "  Fréquence        : " + WifiData['wlanradio']['wifi0_ath']['OperatingFrequencyBand'] + "\n"
 	WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi0_ath']['SupportedFrequencyBands'] + "\n"
 	WifiConf += "    OperatingStandards : " + WifiData['wlanradio']['wifi0_ath']['OperatingStandards'] + "\n"
 	WifiConf += "    Channel            : " + str(WifiData['wlanradio']['wifi0_ath']['Channel']) + "\n"
-	WifiConf += "    SSID               : " + str(WifiData['wlanvap']['wl0']['SSID']) + "\n"
+	WifiConf += "    SSID               : " + re.sub('.{4}$','XXXX',str(WifiData['wlanvap']['wl0']['SSID']),0,0) + "\n"
 	WifiConf += "    SSID visible       : " + str(WifiData['wlanvap']['wl0']['SSIDAdvertisementEnabled']) + "\n"
-	WifiConf += "    BSSID              : " + WifiData['wlanvap']['wl0']['BSSID'] + "\n"
-	WifiConf += "    WEPKey             : " + WifiData['wlanvap']['wl0']['Security']['WEPKey'] + "\n"
-	WifiConf += "    PreSharedKey       : " + WifiData['wlanvap']['wl0']['Security']['PreSharedKey'] + "\n"
-	WifiConf += "    KeyPassPhrase      : " + WifiData['wlanvap']['wl0']['Security']['KeyPassPhrase'] + "\n"
+	WifiConf += "    BSSID              : " + re.sub('[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$','XX:XX:XX:XX',WifiData['wlanvap']['wl0']['BSSID'],0,0) + "\n"
+	WifiConf += "    WEPKey             : " + re.sub('.','X',WifiData['wlanvap']['wl0']['Security']['WEPKey'],0,0) + "\n"
+	WifiConf += "    PreSharedKey       : " + re.sub('.','X',WifiData['wlanvap']['wl0']['Security']['PreSharedKey'],0,0) + "\n"
+	WifiConf += "    KeyPassPhrase      : " + re.sub('.','X',WifiData['wlanvap']['wl0']['Security']['KeyPassPhrase'],0,0) + "\n"
 	WifiConf += "    ModeEnabled        : " + WifiData['wlanvap']['wl0']['Security']['ModeEnabled'] + "\n"
 	WifiConf += "    MACFiltering       : " + WifiData['wlanvap']['wl0']['MACFiltering']['Mode'] + "\n"
 	WifiConf += "    SelfPIN            : " + WifiData['wlanvap']['wl0']['WPS']['SelfPIN'] + "\n"
@@ -277,12 +281,12 @@ if __name__ == '__main__':
 	WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi1_ath']['SupportedFrequencyBands'] + "\n"
 	WifiConf += "    OperatingStandards : " + WifiData['wlanradio']['wifi1_ath']['OperatingStandards'] + "\n"
 	WifiConf += "    Channel            : " + str(WifiData['wlanradio']['wifi1_ath']['Channel']) + "\n"
-	WifiConf += "    SSID               : " + WifiData['wlanvap']['wl1']['SSID'] + "\n"
+	WifiConf += "    SSID               : " + re.sub('.{4}$','XXXX',str(WifiData['wlanvap']['wl1']['SSID']),0,0) + "\n"
 	WifiConf += "    SSID visible       : " + str(WifiData['wlanvap']['wl1']['SSIDAdvertisementEnabled']) + "\n"
-	WifiConf += "    BSSID              : " + WifiData['wlanvap']['wl1']['BSSID'] + "\n"
-	WifiConf += "    WEPKey             : " + WifiData['wlanvap']['wl1']['Security']['WEPKey'] + "\n"
-	WifiConf += "    PreSharedKey       : " + WifiData['wlanvap']['wl1']['Security']['PreSharedKey'] + "\n"
-	WifiConf += "    KeyPassPhrase      : " + WifiData['wlanvap']['wl1']['Security']['KeyPassPhrase'] + "\n"
+	WifiConf += "    BSSID              : " + re.sub('[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$','XX:XX:XX:XX',WifiData['wlanvap']['wl1']['BSSID'],0,0) + "\n"
+	WifiConf += "    WEPKey             : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['WEPKey'],0,0) + "\n"
+	WifiConf += "    PreSharedKey       : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['PreSharedKey'],0,0) + "\n"
+	WifiConf += "    KeyPassPhrase      : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['KeyPassPhrase'],0,0) + "\n"
 	WifiConf += "    ModeEnabled        : " + WifiData['wlanvap']['wl1']['Security']['ModeEnabled'] + "\n"
 	WifiConf += "    MACFiltering       : " + WifiData['wlanvap']['wl1']['MACFiltering']['Mode'] + "\n"
 	WifiConf += "    SelfPIN            : " + WifiData['wlanvap']['wl1']['WPS']['SelfPIN'] + "\n"
@@ -299,21 +303,22 @@ if __name__ == '__main__':
 	
 	
 	# # Début de getDSLStats
+	print("[---]\n")
 	dslstats = lb.DSLStats()
-	initTimeouts = dslstats['InitTimeouts']
-	if initTimeouts == 4294967295:
-		initTimeouts = -1
+	# initTimeouts = dslstats['InitTimeouts']
+	# if initTimeouts == 4294967295:
+		# initTimeouts = -1
 		
 	DSLStats  = " Statistiques de la ligne" + "\n" 
 	if LinkType == "ethernet":
-		DSLStats += "  /!\ Résultats non significatifs avec un WAN EThernet" + "\n"
+		DSLStats += "  /!\ Résultats non significatifs avec un WAN Ethernet" + "\n"
 	
 	DSLStats += "     ReceiveBlocks        : " + str(dslstats['ReceiveBlocks']) + "\n" 
 	DSLStats += "     TransmitBlocks       : " + str(dslstats['TransmitBlocks']) + "\n" 
 	DSLStats += "     CellDelin            : " + str(dslstats['CellDelin']) + "\n" 
 	DSLStats += "     LinkRetrain          : " + str(dslstats['LinkRetrain']) + "\n" 
 	DSLStats += "     InitErrors           : " + str(dslstats['InitErrors']) + "\n" 
-	DSLStats += "     InitTimeouts         : " + str(initTimeouts) + "\n" 
+	DSLStats += "     InitTimeouts         : " + str(ctypes.c_long(dslstats['InitTimeouts']).value) + "\n"  
 	DSLStats += "     LossOfFraming        : " + str(dslstats['LossOfFraming']) + "\n" 
 	DSLStats += "     ErroredSecs          : " + str(dslstats['ErroredSecs']) + "\n" 
 	DSLStats += "     SeverelyErroredSecs  : " + str(dslstats['SeverelyErroredSecs']) + "\n" 
@@ -332,7 +337,7 @@ if __name__ == '__main__':
 	IPTV_Status += "    IPTVStatus          : " + iptvstatus['data']['IPTVStatus'] + "\n"
 	print(IPTV_Status)
 	# # Fin de IPTVStatus
-	
+	print("[/quote]\n")
 	# # Début de OrangeServices
 	# Ne fonctionne pas sur LB3 et antérieures en janvier 2017
 	# print((lb.orange_services()))
@@ -346,6 +351,3 @@ if __name__ == '__main__':
 	## Déconnexion
 	print((lb.logout()))
 
-
-
-	
