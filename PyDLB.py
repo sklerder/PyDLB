@@ -4,7 +4,7 @@
 # Portage par JoeKer pour FONO sur la base de :
 # - rene-d/sysbus (https://github.com/rene-d/sysbus)
 # - fccagou/pylivebox (https://github.com/fccagou/pylivebox/blob/master/livebox/livebox.py)
-# Merci de votre indulgence, je découvre Python ...
+# Merci de votre indulgence, je dÃ©couvre Python ...
 
 import urllib.request, urllib.parse, urllib.error
 import json
@@ -37,11 +37,11 @@ class Livebox:
 
 		values = {'username' : 'admin', 'password' : password }
 		if VERSION_LIVEBOX != 'lb3' and VERSION_LIVEBOX != 'lb4':
-			# On est probablement sur l'ancienne méthode d'authentification (avant décembre 2016)
+			# On est probablement sur l'ancienne mÃ©thode d'authentification (avant dÃ©cembre 2016)
 			auth = { 'username':USER_LIVEBOX, 'password':PASSWORD_LIVEBOX }
 			r = session.post(URL_LIVEBOX + '/authenticate', params=auth)
 		else:
-			# Cette méthode fonctionne avec les firmwares récents (fin décembre 2016) de la LB3 et de la LB4
+			# Cette mÃ©thode fonctionne avec les firmwares rÃ©cents (fin dÃ©cembre 2016) de la LB3 et de la LB4
 			auth = '{"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"so_sdkut","username":"%s","password":"%s"}}' % (USER_LIVEBOX, PASSWORD_LIVEBOX)
 			sah_headers = { 'Content-Type':'application/x-sah-ws-1-call+json', 'Authorization':'X-Sah-Login' }
 			r = session.post(URL_LIVEBOX + '/ws', data=auth, headers=sah_headers)
@@ -105,7 +105,7 @@ class Livebox:
 		return j['status']
 
 	def list_trunks(self):
-		'''Information téléphonie IP'''
+		'''Information tÃ©lÃ©phonie IP'''
 		j = self._sysbus('VoiceService/VoiceApplication:listTrunks')
 		return j['result']
 
@@ -176,7 +176,7 @@ if __name__ == '__main__':
 	secondes = str(int(uptime % 86400 % 3600 % 60))
 	Start = jours + " j. " + heures + " h. " + minutes + " mn. " + secondes + " s." 
 
-	# # Début de DeviceInfo
+	# # DÃ©but de DeviceInfo
 	DeviceInfo =  " Device Info" + "\n"
 	DeviceInfo += "    Manufacturer          : " + DevInfo['Manufacturer'] + "\n"
 	DeviceInfo += "    ManufacturerOUI       : " + DevInfo['ManufacturerOUI'] + "\n"
@@ -191,14 +191,14 @@ if __name__ == '__main__':
 	DeviceInfo += "    SpecVersion           : " + DevInfo['SpecVersion'] + "\n"
 	DeviceInfo += "    ProvisioningCode      : " + DevInfo['ProvisioningCode'] + "\n"
 	DeviceInfo += "    UpTime                : " + str(DevInfo['UpTime']) + "\n"
-	DeviceInfo += "      Démarrée depuis le  : " + Date_Demarrage + "\n"
-	DeviceInfo += "      Démarrée depuis     : " + Start + "\n"
+	DeviceInfo += "      DÃ©marrÃ©e depuis le  : " + Date_Demarrage + "\n"
+	DeviceInfo += "      DÃ©marrÃ©e depuis     : " + Start + "\n"
 	DeviceInfo += "    Country               : " + DevInfo['Country'] + "\n"
 	DeviceInfo += "    NumberOfReboots       : " + str(DevInfo['NumberOfReboots']) + "\n"
 	print(DeviceInfo)
 	# # Fin de DeviceInfo
 	
-	# # Début de WanStatus
+	# # DÃ©but de WanStatus
 	mtu = str(lb.mtu())
 	vlanid = str(lb.vlan_id())
 	wanstatus = lb.wan_status()
@@ -222,7 +222,7 @@ if __name__ == '__main__':
 	print(WanStatus)
 	# # Fin de WanStatus
 	
-	# # Début de VoipConfig
+	# # DÃ©but de VoipConfig
 	
 	voip_config = lb.voip_config()
 	
@@ -231,7 +231,7 @@ if __name__ == '__main__':
 
 	SIP_Trunk = {str(trunks_result[0])}
 	H323_trunk = {str(trunks_result[1])}
-	VOIPConfig  = " Téléphonie IP" + "\n"
+	VOIPConfig  = " TÃ©lÃ©phonie IP" + "\n"
 	VOIPConfig += "  Name                   : " + voip_config[0]['Name'] + "\n"
 	VOIPConfig += "    Enable                   : " + voip_config[0]['Enable'] + "\n"
 	VOIPConfig += "    Protocol                 : " + voip_config[0]['Protocol'] + "\n"
@@ -241,7 +241,7 @@ if __name__ == '__main__':
 	VOIPConfig += "    PhysInterface            : " + voip_config[0]['PhysInterface'] + "\n"
 	VOIPConfig += "    Etat SIP                 : " + str(trunks_result[0]['trunk_lines'][0]['status']) + "\n"
 	VOIPConfig += "    Activation SIP           : " + str(trunks_result[0]['trunk_lines'][0]['enable']) + "\n"
-	VOIPConfig += "    Numéro d'annuaire SIP    : " + str(trunks_result[0]['trunk_lines'][0]['directoryNumber']) + "\n"
+	VOIPConfig += "    NumÃ©ro d'annuaire SIP    : " + str(trunks_result[0]['trunk_lines'][0]['directoryNumber']) + "\n"
 	VOIPConfig += "\n"
 	VOIPConfig += "  Name                   : " + voip_config[1]['Name'] + "\n"
 	VOIPConfig += "    Enable                   : " + voip_config[1]['Enable'] + "\n"
@@ -252,14 +252,14 @@ if __name__ == '__main__':
 	VOIPConfig += "    PhysInterface            : " + voip_config[1]['PhysInterface'] + "\n"
 	VOIPConfig += "    Etat H323                : " + str(trunks_result[1]['trunk_lines'][0]['status']) + "\n"
 	VOIPConfig += "    Activation H323          : " + str(trunks_result[1]['trunk_lines'][0]['enable']) + "\n"
-	VOIPConfig += "    Numéro d'annuaire H323   : " + str(trunks_result[1]['trunk_lines'][0]['directoryNumber']) + "\n"
+	VOIPConfig += "    NumÃ©ro d'annuaire H323   : " + str(trunks_result[1]['trunk_lines'][0]['directoryNumber']) + "\n"
 	print(VOIPConfig)
 	# # Fin de VoipConfig
 	
-	# # Début de Wi-Fi
+	# # DÃ©but de Wi-Fi
 	WifiData = lb.wifi_mibs()
 	WifiConf  = " Etat Wi-Fi" + "\n"
-	WifiConf += "  Fréquence        : " + WifiData['wlanradio']['wifi0_ath']['OperatingFrequencyBand'] + "\n"
+	WifiConf += "  FrÃ©quence        : " + WifiData['wlanradio']['wifi0_ath']['OperatingFrequencyBand'] + "\n"
 	WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi0_ath']['SupportedFrequencyBands'] + "\n"
 	WifiConf += "    OperatingStandards : " + WifiData['wlanradio']['wifi0_ath']['OperatingStandards'] + "\n"
 	WifiConf += "    Channel            : " + str(WifiData['wlanradio']['wifi0_ath']['Channel']) + "\n"
@@ -273,7 +273,7 @@ if __name__ == '__main__':
 	WifiConf += "    MACFiltering       : " + WifiData['wlanvap']['wl0']['MACFiltering']['Mode'] + "\n"
 	WifiConf += "    SelfPIN            : " + WifiData['wlanvap']['wl0']['WPS']['SelfPIN'] + "\n"
 	WifiConf += "\n"
-	WifiConf += "  Fréquence        : " + WifiData['wlanradio']['wifi1_ath']['OperatingFrequencyBand'] + "\n"
+	WifiConf += "  FrÃ©quence        : " + WifiData['wlanradio']['wifi1_ath']['OperatingFrequencyBand'] + "\n"
 	WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi1_ath']['SupportedFrequencyBands'] + "\n"
 	WifiConf += "    OperatingStandards : " + WifiData['wlanradio']['wifi1_ath']['OperatingStandards'] + "\n"
 	WifiConf += "    Channel            : " + str(WifiData['wlanradio']['wifi1_ath']['Channel']) + "\n"
@@ -289,7 +289,7 @@ if __name__ == '__main__':
 	print (WifiConf)
 	
 	WifiCom = lb.wifi_com_status()
-	WifiComm  = "  Wi-Fi partagé" + "\n"
+	WifiComm  = "  Wi-Fi partagÃ©" + "\n"
 	WifiComm += "    SSID                : " + WifiCom['result']['data']['SSID'] + "\n"
 	WifiComm += "    Status              : " + WifiCom['result']['data']['Status'] + "\n"
 	WifiComm += "    Enable              : " + str(WifiCom['result']['data']['Enable']) + "\n"
@@ -298,7 +298,7 @@ if __name__ == '__main__':
 	
 	
 	
-	# # Début de getDSLStats
+	# # DÃ©but de getDSLStats
 	dslstats = lb.DSLStats()
 	initTimeouts = dslstats['InitTimeouts']
 	if initTimeouts == 4294967295:
@@ -306,7 +306,7 @@ if __name__ == '__main__':
 		
 	DSLStats  = " Statistiques de la ligne" + "\n" 
 	if LinkType == "ethernet":
-		DSLStats += "  /!\ Résultats non significatifs avec un WAN EThernet" + "\n"
+		DSLStats += "  /!\ RÃ©sultats non significatifs avec un WAN EThernet" + "\n"
 	
 	DSLStats += "     ReceiveBlocks        : " + str(dslstats['ReceiveBlocks']) + "\n" 
 	DSLStats += "     TransmitBlocks       : " + str(dslstats['TransmitBlocks']) + "\n" 
@@ -326,48 +326,26 @@ if __name__ == '__main__':
 	print(DSLStats)
 	# # Fin de getDSLStats
 	
-	# # Début de IPTVStatus
+	# # DÃ©but de IPTVStatus
 	iptvstatus = lb.ip_tv_status()['result']
 	IPTV_Status  = " Etat des services TV" + "\n"
 	IPTV_Status += "    IPTVStatus          : " + iptvstatus['data']['IPTVStatus'] + "\n"
 	print(IPTV_Status)
 	# # Fin de IPTVStatus
 	
-	# # Début de OrangeServices
-	# Ne fonctionne pas sur LB3 et antérieures en janvier 2017
+	# # DÃ©but de OrangeServices
+	# Ne fonctionne pas sur LB3 et antÃ©rieures en janvier 2017
 	# print((lb.orange_services()))
 	# # Fin de OrangeServices
 	
-	# # Début de ConnectedDevices
-	# Pas implémenté
+	# # DÃ©but de ConnectedDevices
+	# Pas implÃ©mentÃ©
 	# print((lb.ws_get_devices(lb.ws_channel_id())))
 	# # Fin de ConnectedDevices
 	
-	## Déconnexion
+	## DÃ©connexion
 	print((lb.logout()))
 
 
 
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
