@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: iso8859-9 -*-
 
+# PyDLB.py
+# Version 0.2
 # Portage par JoeKer pour FONO sur la base de :
 # - rene-d/sysbus (https://github.com/rene-d/sysbus)
 # - fccagou/pylivebox (https://github.com/fccagou/pylivebox/blob/master/livebox/livebox.py)
@@ -231,9 +233,9 @@ if __name__ == '__main__':
 	
 	trunks_list = lb.list_trunks()
 	trunks_result = trunks_list['status']
-
+	szTrunks = len(trunks_result)
+	
 	SIP_Trunk = {str(trunks_result[0])}
-	H323_trunk = {str(trunks_result[1])}
 	VOIPConfig  = " Téléphonie IP" + "\n"
 	VOIPConfig += "  Name                   : " + voip_config[0]['Name'] + "\n"
 	VOIPConfig += "    Enable                   : " + voip_config[0]['Enable'] + "\n"
@@ -245,23 +247,26 @@ if __name__ == '__main__':
 	VOIPConfig += "    Etat SIP                 : " + str(trunks_result[0]['trunk_lines'][0]['status']) + "\n"
 	VOIPConfig += "    Activation SIP           : " + str(trunks_result[0]['trunk_lines'][0]['enable']) + "\n"
 	VOIPConfig += "    Numéro d'annuaire SIP    : " + re.sub('[0-9]{8}$','XXXXXXXX',str(trunks_result[0]['trunk_lines'][0]['directoryNumber']),0,0) + "\n"
-	VOIPConfig += "\n"
-	VOIPConfig += "  Name                   : " + voip_config[1]['Name'] + "\n"
-	VOIPConfig += "    Enable                   : " + voip_config[1]['Enable'] + "\n"
-	VOIPConfig += "    Protocol                 : " + voip_config[1]['Protocol'] + "\n"
-	VOIPConfig += "    Encapsulation            : " + voip_config[1]['Encapsulation'] + "\n"
-	VOIPConfig += "    InterfaceId              : " + voip_config[1]['InterfaceId'] + "\n"
-	VOIPConfig += "    Interface                : " + voip_config[1]['Interface'] + "\n"
-	VOIPConfig += "    PhysInterface            : " + voip_config[1]['PhysInterface'] + "\n"
-	VOIPConfig += "    Etat H323                : " + str(trunks_result[1]['trunk_lines'][0]['status']) + "\n"
-	VOIPConfig += "    Activation H323          : " + str(trunks_result[1]['trunk_lines'][0]['enable']) + "\n"
-	VOIPConfig += "    Numéro d'annuaire H323   : " + re.sub('[0-9]{8}$','XXXXXXXX',str(trunks_result[1]['trunk_lines'][0]['directoryNumber']),0,0) + "\n"
+	if szTrunks != 0:
+		H323_trunk = {str(trunks_result[1])}
+		VOIPConfig += "\n"
+		VOIPConfig += "  Name                   : " + voip_config[1]['Name'] + "\n"
+		VOIPConfig += "    Enable                   : " + voip_config[1]['Enable'] + "\n"
+		VOIPConfig += "    Protocol                 : " + voip_config[1]['Protocol'] + "\n"
+		VOIPConfig += "    Encapsulation            : " + voip_config[1]['Encapsulation'] + "\n"
+		VOIPConfig += "    InterfaceId              : " + voip_config[1]['InterfaceId'] + "\n"
+		VOIPConfig += "    Interface                : " + voip_config[1]['Interface'] + "\n"
+		VOIPConfig += "    PhysInterface            : " + voip_config[1]['PhysInterface'] + "\n"
+		VOIPConfig += "    Etat H323                : " + str(trunks_result[1]['trunk_lines'][0]['status']) + "\n"
+		VOIPConfig += "    Activation H323          : " + str(trunks_result[1]['trunk_lines'][0]['enable']) + "\n"
+		VOIPConfig += "    Numéro d'annuaire H323   : " + re.sub('[0-9]{8}$','XXXXXXXX',str(trunks_result[1]['trunk_lines'][0]['directoryNumber']),0,0) + "\n"
 	print(VOIPConfig)
 	# # Fin de VoipConfig
 	
 	# # Début de Wi-Fi
 	print("[---]\n")
 	WifiData = lb.wifi_mibs()
+	szWifData = len(WifiData['wlanradio'])
 	WifiConf  = " Etat Wi-Fi" + "\n"
 	WifiConf += "  Fréquence        : " + WifiData['wlanradio']['wifi0_ath']['OperatingFrequencyBand'] + "\n"
 	WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi0_ath']['SupportedFrequencyBands'] + "\n"
@@ -276,20 +281,22 @@ if __name__ == '__main__':
 	WifiConf += "    ModeEnabled        : " + WifiData['wlanvap']['wl0']['Security']['ModeEnabled'] + "\n"
 	WifiConf += "    MACFiltering       : " + WifiData['wlanvap']['wl0']['MACFiltering']['Mode'] + "\n"
 	WifiConf += "    SelfPIN            : " + WifiData['wlanvap']['wl0']['WPS']['SelfPIN'] + "\n"
-	WifiConf += "\n"
-	WifiConf += "  Fréquence        : " + WifiData['wlanradio']['wifi1_ath']['OperatingFrequencyBand'] + "\n"
-	WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi1_ath']['SupportedFrequencyBands'] + "\n"
-	WifiConf += "    OperatingStandards : " + WifiData['wlanradio']['wifi1_ath']['OperatingStandards'] + "\n"
-	WifiConf += "    Channel            : " + str(WifiData['wlanradio']['wifi1_ath']['Channel']) + "\n"
-	WifiConf += "    SSID               : " + re.sub('.{4}$','XXXX',str(WifiData['wlanvap']['wl1']['SSID']),0,0) + "\n"
-	WifiConf += "    SSID visible       : " + str(WifiData['wlanvap']['wl1']['SSIDAdvertisementEnabled']) + "\n"
-	WifiConf += "    BSSID              : " + re.sub('[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$','XX:XX:XX:XX',WifiData['wlanvap']['wl1']['BSSID'],0,0) + "\n"
-	WifiConf += "    WEPKey             : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['WEPKey'],0,0) + "\n"
-	WifiConf += "    PreSharedKey       : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['PreSharedKey'],0,0) + "\n"
-	WifiConf += "    KeyPassPhrase      : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['KeyPassPhrase'],0,0) + "\n"
-	WifiConf += "    ModeEnabled        : " + WifiData['wlanvap']['wl1']['Security']['ModeEnabled'] + "\n"
-	WifiConf += "    MACFiltering       : " + WifiData['wlanvap']['wl1']['MACFiltering']['Mode'] + "\n"
-	WifiConf += "    SelfPIN            : " + WifiData['wlanvap']['wl1']['WPS']['SelfPIN'] + "\n"
+	if szWifData != 0:
+		WifiConf += "\n"
+		WifiConf += "  Fréquence        : " + WifiData['wlanradio']['wifi1_ath']['OperatingFrequencyBand'] + "\n"
+		WifiConf += "    SupportedBands     : " + WifiData['wlanradio']['wifi1_ath']['SupportedFrequencyBands'] + "\n"
+		WifiConf += "    OperatingStandards : " + WifiData['wlanradio']['wifi1_ath']['OperatingStandards'] + "\n"
+		WifiConf += "    Channel            : " + str(WifiData['wlanradio']['wifi1_ath']['Channel']) + "\n"
+		WifiConf += "    SSID               : " + re.sub('.{4}$','XXXX',str(WifiData['wlanvap']['wl1']['SSID']),0,0) + "\n"
+		WifiConf += "    SSID visible       : " + str(WifiData['wlanvap']['wl1']['SSIDAdvertisementEnabled']) + "\n"
+		WifiConf += "    BSSID              : " + re.sub('[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$','XX:XX:XX:XX',WifiData['wlanvap']['wl1']['BSSID'],0,0) + "\n"
+		WifiConf += "    WEPKey             : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['WEPKey'],0,0) + "\n"
+		WifiConf += "    PreSharedKey       : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['PreSharedKey'],0,0) + "\n"
+		WifiConf += "    KeyPassPhrase      : " + re.sub('.','X',WifiData['wlanvap']['wl1']['Security']['KeyPassPhrase'],0,0) + "\n"
+		WifiConf += "    ModeEnabled        : " + WifiData['wlanvap']['wl1']['Security']['ModeEnabled'] + "\n"
+		WifiConf += "    MACFiltering       : " + WifiData['wlanvap']['wl1']['MACFiltering']['Mode'] + "\n"
+		WifiConf += "    SelfPIN            : " + WifiData['wlanvap']['wl1']['WPS']['SelfPIN'] + "\n"
+	
 	print (WifiConf)
 	
 	WifiCom = lb.wifi_com_status()
@@ -350,4 +357,3 @@ if __name__ == '__main__':
 	
 	## Déconnexion
 	print((lb.logout()))
-
